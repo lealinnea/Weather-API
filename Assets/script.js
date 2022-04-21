@@ -2,26 +2,49 @@
 //   var x = document.querySelector('#exampleDataList').innerText;
 //   console.log(x);
 
-        let gotPosition = function(pos) {
-            let lat = pos.coords.latitude;
-            let long = pos.coords.longitude;
-            console.log(lat);
-            console.log(long);
-            getForecast(lat, long);
-        }
+const apiKey = "&appid=62ca58f933f1fcecfd39451eb3a258c2"
+
+// need function to get text from input box 
+// and have it produce a useable string for apicall
+
+function getCity(event){
+    event.preventDefault()
+    let input = document.querySelector('#citySearch')
+    let cityName = input.value
+    console.log(cityName);
+    getCoords(cityName);
+} 
+
+// function to call geolocation api to get coordinates
+// have it call "getforecast" with those coordinates as arguments
+function getCoords(city){
+    const apiUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=${1}${apiKey}`
+
+fetch(apiUrl)
+  .then(function (response) {
+    return response.json();
+  })
+  .then(function (data) {
+    console.log(data);
+  });   
+}
+
 
         let getForecast = function(lat, long) {
             let url = "https://api.openweathermap.org/data/2.5/onecall?lat=" + "&lat" + "&long"+ "&exclude=current,minutely,hourly&appid=62ca58f933f1fcecfd39451eb3a258c2";
+        
             getWeatherText(url);
         }
 
-        async function getWeatherText(url) {
-            let weatherObject = await fetch(url);
-            let weatherText = await weatherObject.text();
-            console.log(weatherObject);
-            console.log(weatherText);
-            parseWeather(weatherText);
-        }
+        // async function getWeatherText(url) {
+        //     let weatherObject = await fetch(url);
+        //     let weatherText = await weatherObject.text();
+        //     console.log(weatherObject);
+        //     console.log(weatherText);
+        //     parseWeather(weatherText);
+        // }
+
+        // use fetch
 
         let parseWeather = function(weatherText) {
             let weatherJSON = JSON.parse(weatherText);
@@ -56,8 +79,7 @@
             document.getElementById("forecast").innerHTML += out;
 
         }
-         
-     
+
 
         let getDayOfWeek = function(dayNum) {
             var weekday = new Array(7);
@@ -90,5 +112,7 @@
             }
             return hours + ":" + minutes;
         }
-        // document.getElementById("button").onclick;
-        navigator.geolocation.getCurrentPosition(gotPosition);
+        document.getElementById("button").addEventListener("click", function (event) {
+            getCity(event)
+        });
+        // navigator.geolocation.getCurrentPosition(gotPosition);
