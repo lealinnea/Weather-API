@@ -21,20 +21,38 @@ function getCoords(city){
     const apiUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=${1}${apiKey}`
 
 fetch(apiUrl)
-  .then(function (response) {
+    .then(function (response) {
     return response.json();
-  })
-  .then(function (data) {
+    })
+    .then(function (data) {
     console.log(data);
-  });   
+    parseCoords(data);
+    });   
 }
 
+function parseCoords(data){
+const lat = data[0].lat
+const lon = data[0].lon
+console.log(lat)
+console.log(lon)
+getForecast(lat,lon)
+} 
+// function to make variables
 
-        let getForecast = function(lat, long) {
-            let url = "https://api.openweathermap.org/data/2.5/onecall?lat=" + "&lat" + "&long"+ "&exclude=current,minutely,hourly&appid=62ca58f933f1fcecfd39451eb3a258c2";
-        
-            getWeatherText(url);
-        }
+
+
+function getForecast(lat, lon) {
+    let url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=imperial&exclude=current,minutely,hourly${apiKey}`;
+
+    fetch(url)
+    .then(function (response) {
+    return response.json();
+    })
+    .then(function (data) {
+    console.log(data);
+    });   
+}
+
 
         // async function getWeatherText(url) {
         //     let weatherObject = await fetch(url);
@@ -47,17 +65,17 @@ fetch(apiUrl)
         // use fetch
 
         let parseWeather = function(weatherText) {
-            let weatherJSON = JSON.parse(weatherText);
-            console.log(weatherJSON);
+            // let weatherJSON = JSON.parse(weatherText);
+            // console.log(weatherJSON);
             let dailyForecast = weatherJSON.daily;
             console.log(dailyForecast);
-            for (x = 0; x < dailyForecast.length; x++) {
+            for (i = 0; i < dailyForecast.length; i++) {
                 let day = dailyForecast[x];
-                let today = new Date().getDay() + x;
-                if (today > 6) {
-                    today = today - 7;
-                }
-                let dayOfWeek = getDayOfWeek(today);
+                // let today = new Date().getDay() + i;
+                // if (today > 6) {
+                //     today = today - 7;
+                // }
+                // let dayOfWeek = getDayOfWeek(today);
                 let description = day.weather[0].description;
                 let icon = day.weather[0].icon;
                 let highTemp = changetoFar(day.temp.max);
@@ -79,6 +97,14 @@ fetch(apiUrl)
             document.getElementById("forecast").innerHTML += out;
 
         }
+        
+
+        // something to think about when making the elements that hold the forecast
+        // example, not actual code
+        // function displayForecasts()
+        // for (let i = 0; i < 5; i++){
+        //     displayforecast(weather[i])
+        // }
 
 
         let getDayOfWeek = function(dayNum) {
@@ -93,13 +119,13 @@ fetch(apiUrl)
 
             return (weekday[dayNum]);
         }
-       
 
-        let changetoFar = function(kelvinTemp) {
-            const celsius = kelvinTemp - 273;
-            const fahrenheit = Math.floor(celsius * (9 / 5) + 32);
-            return fahrenheit
-        }
+
+        // let changetoFar = function(kelvinTemp) {
+        //     const celsius = kelvinTemp - 273;
+        //     const fahrenheit = Math.floor(celsius * (9 / 5) + 32);
+        //     return fahrenheit
+        // }
 
         let timestampToTime = function(timeStamp) {
             let date = new Date(timeStamp * 1000);
