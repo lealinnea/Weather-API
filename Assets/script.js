@@ -1,7 +1,4 @@
 
-//   var x = document.querySelector('#exampleDataList').innerText;
-//   console.log(x);
-
 const apiKey = "&appid=62ca58f933f1fcecfd39451eb3a258c2"
 
 // need function to get text from input box 
@@ -54,28 +51,11 @@ function getForecast(lat, lon) {
 }
 
 
-        // async function getWeatherText(url) {
-        //     let weatherObject = await fetch(url);
-        //     let weatherText = await weatherObject.text();
-        //     console.log(weatherObject);
-        //     console.log(weatherText);
-        //     parseWeather(weatherText);
-        // }
-
-        // use fetch
-
         let parseWeather = function(weatherText) {
-            // let weatherJSON = JSON.parse(weatherText);
-            // console.log(weatherJSON);
             let dailyForecast = weatherJSON.daily;
             console.log(dailyForecast);
             for (i = 0; i < dailyForecast.length; i++) {
-                let day = dailyForecast[x];
-                // let today = new Date().getDay() + i;
-                // if (today > 6) {
-                //     today = today - 7;
-                // }
-                // let dayOfWeek = getDayOfWeek(today);
+                let day = dailyForecast[i];
                 let description = day.weather[0].description;
                 let icon = day.weather[0].icon;
                 let highTemp = changetoFar(day.temp.max);
@@ -120,13 +100,6 @@ function getForecast(lat, lon) {
             return (weekday[dayNum]);
         }
 
-
-        // let changetoFar = function(kelvinTemp) {
-        //     const celsius = kelvinTemp - 273;
-        //     const fahrenheit = Math.floor(celsius * (9 / 5) + 32);
-        //     return fahrenheit
-        // }
-
         let timestampToTime = function(timeStamp) {
             let date = new Date(timeStamp * 1000);
             let hours = date.getHours();
@@ -141,4 +114,3 @@ function getForecast(lat, lon) {
         document.getElementById("button").addEventListener("click", function (event) {
             getCity(event)
         });
-        // navigator.geolocation.getCurrentPosition(gotPosition);
