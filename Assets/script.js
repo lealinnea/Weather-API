@@ -1,116 +1,169 @@
+// using the date prototype to add days 
+Date.prototype.addDays = function(days) {
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    var dd = String(date.getDate()).padStart(2, '0');
+    var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = date.getFullYear();
+    var dateString = mm + '/' + dd + '/' + yyyy;
 
-const apiKey = "&appid=62ca58f933f1fcecfd39451eb3a258c2"
-
-// need function to get text from input box 
-// and have it produce a useable string for apicall
-
-function getCity(event){
-    event.preventDefault()
-    let input = document.querySelector('#citySearch')
-    let cityName = input.value
-    console.log(cityName);
-    getCoords(cityName);
-} 
-
-// function to call geolocation api to get coordinates
-// have it call "getforecast" with those coordinates as arguments
-function getCoords(city){
-    const apiUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=${1}${apiKey}`
-
-fetch(apiUrl)
-    .then(function (response) {
-    return response.json();
-    })
-    .then(function (data) {
-    console.log(data);
-    parseCoords(data);
-    });   
-}
-
-function parseCoords(data){
-const lat = data[0].lat
-const lon = data[0].lon
-console.log(lat)
-console.log(lon)
-getForecast(lat,lon)
-} 
-// function to make variables
-
-
-
-function getForecast(lat, lon) {
-    let url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=imperial&exclude=current,minutely,hourly${apiKey}`;
-
-    fetch(url)
-    .then(function (response) {
-    return response.json();
-    })
-    .then(function (data) {
-    console.log(data);
-    });   
+    return dateString;
 }
 
 
-        let parseWeather = function(weatherText) {
-            let dailyForecast = weatherJSON.daily;
-            console.log(dailyForecast);
-            for (i = 0; i < dailyForecast.length; i++) {
-                let day = dailyForecast[i];
-                let description = day.weather[0].description;
-                let icon = day.weather[0].icon;
-                let highTemp = changetoFar(day.temp.max);
-                let humidity = day.humidity;
-                let windSpeed = day.wind_speed;
-                let uvi = day.uvi;
-                displayWeatherDay(dayOfWeek, description, icon, highTemp, humidity, windSpeed, uvi);
+// main function to get the weather data 
+function getWeatherData(){
+    console.log("GET WEATHER")
+    fromSearchHistory = false
+    var searchHistoryEl = $("#searchHistory");
+    // having search history to an empty array so we can push entries into it
+    var searchHistory = [];
+
+    var cityHistory = localStorage.getItem("history");
+    // if city history(from local storage) is not null then show the city names 
+    if (cityHistory !== null){
+        searchHistory = JSON.parse(cityHistory);
+        if (searchHistoryEl.children().length === 0){
+            for(var i=0; i<searchHistory.length; i++){
+                showHistory(searchHistory[i],searchHistoryEl);
             }
         }
+    } else {
+        console.log("There is no search history found")
+    }
 
-        let displayWeatherDay = function(dayOfWeek, description, icon, highTemp, humidity, windSpeed, uvi) {
-            let out = "<div class='weatherDay'><img src='http://openweathermap.org/img/wn/" + icon + ".png'/>";
-            out += "<h2>" + dayOfWeek + "</h2>";
-            out += "<h3>" + description + "</h3>";
-            out += "<p>High Temperature: " + highTemp + "F</p>";
-            out += "<p>Humidity: " + humidity + "%</p>";
-            out += "<p>Wind Speed: " + Math.round(windSpeed) + "</p></div>";
-            out += "<p>UV Index: " + uvi + "</p></div>";
-            document.getElementById("forecast").innerHTML += out;
 
+    // if there is search history create then as list items and make them buttons so they are clickable and will run the weather API query
+     if (event === undefined){
+        var cityName = localStorage.getItem("city");
+    } else if ((event.target).nodeName === "LI"){
+        fromSearchHistory = true
+        var cityName = event.target.textContent;
+        console.log(cityName)
+    } else if ((event.target).nodeName === "BUTTON") {
+        inputField = $("#cityName")
+        var cityName = inputField[0].value;
+    } 
+
+
+    // API variables
+    var apiKey = "98e46e361787699b6e62a63c5142d5a0"
+    var currentDayAPI = "https://api.openweathermap.org/data/2.5/weather?q="+cityName+"&appid="+apiKey;
+
+
+    return $.ajax({
+        url: currentDayAPI,
+        method: "GET",
+        dataType: "json",
+    })
+
+    .then(function (response) {
+        var lat = response.coord.lat;
+        var lon = response.coord.lon;
+        var cityName = response.name;
+        // Getting todays date
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); 
+        var yyyy = today.getFullYear();
+        today = mm + '/' + dd + '/' + yyyy;
+
+        // push new city entry into searchhistory array and set it in local storage
+        if ((!fromSearchHistory)&&(!searchHistory.includes(cityName))){
+            showHistory(cityName,searchHistoryEl);
+            searchHistory.push(cityName);
+            console.log(searchHistory);
+            localStorage.setItem("history",JSON.stringify(searchHistory));
         }
-        
-
-        // something to think about when making the elements that hold the forecast
-        // example, not actual code
-        // function displayForecasts()
-        // for (let i = 0; i < 5; i++){
-        //     displayforecast(weather[i])
-        // }
+        localStorage.setItem("city",cityName);
 
 
-        let getDayOfWeek = function(dayNum) {
-            var weekday = new Array(7);
-            weekday[0] = "Sunday";
-            weekday[1] = "Monday";
-            weekday[2] = "Tuesday";
-            weekday[3] = "Wednesday";
-            weekday[4] = "Thursday";
-            weekday[5] = "Friday";
-            weekday[6] = "Saturday";
+        // Getting the 5 day forecast weather data
+        var forecastAPI = "https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"&lon="+lon+"&exclude=minutely,hourly&units=imperial&appid="+apiKey;
+        $.ajax({
+            url: forecastAPI,
+            method: "GET"
+        })
 
-            return (weekday[dayNum]);
-        }
+        .then(function(response) {
+            var weatherDataForecast = response.current;
+            var description = weatherDataForecast.weather[0].icon;
+            var icon = "https://openweathermap.org/img/wn/" + description + ".png";
+            var iconImgEl = "<img src="+icon+">"
+            // printing city, date, and icon 
+            $("#city").html((cityName)+ " ("+today+") "+iconImgEl);
+            // setting temp, humidity, wind, uv
+            var temp = weatherDataForecast.temp;
+            $("#temperature").text(temp+" °F");
+            var humidity = weatherDataForecast.humidity;
+            $("#humidity").text(humidity+"%");
+            var windSpeed = weatherDataForecast.wind_speed;
+            $("#windSpeed").text(windSpeed+" mph");
+            var uv = weatherDataForecast.uvi;
+            // adding a button class to the uv index and making the text white
+            $("#uvIndex").addClass("button");
+            $("#uvIndex").text(uv);
+            $("#uvIndex").css("color","white");
 
-        let timestampToTime = function(timeStamp) {
-            let date = new Date(timeStamp * 1000);
-            let hours = date.getHours();
-            let minutes = "";
-            if (date.getMinutes() < 10) {
-                minutes = "0" + date.getMinutes();
-            } else {
-                minutes = date.getMinutes();
+            // if uv is 2 or lower then the color should be green
+            // if uv is 8 or lower then the color should be orange
+            // whatever else red
+            if (uv <= 2){
+                $("#uvIndex").css("background-color","green");
+                $("#uvIndex").css("padding","8px");
             }
-            return hours + ":" + minutes;
-        }
-        document.getElementById("button").addEventListener("click", function (event) {
-            getCity(event)
-        });
+            else if (uv <= 8){
+                $("#uvIndex").css("background-color","orange");
+                $("#uvIndex").css("padding","8px");
+            }
+            else{
+                $("#uvIndex").css("background-color","red");
+                $("#uvIndex").css("padding","8px");
+            }
+
+            
+            var dailyWeatherArray = response.daily; 
+            for (var i = 1;i < 6;i++){
+                var currentDay = dailyWeatherArray[i]
+                
+                var date = new Date();
+                date = date.addDays(i);
+                
+                $(".date"+i).text(date);
+                var currentIcon = currentDay.weather[0].icon;
+                var icon = "https://openweathermap.org/img/wn/" + currentIcon + ".png";
+                $(".icon"+i).attr("src",icon);
+                
+                var temp = currentDay.temp.day;
+                $(".temp"+i).text("Temp: "+temp+" °F");
+
+                var humidity = currentDay.humidity;
+                $(".humidity"+i).text("Humidity: "+humidity+"%");
+            }
+        })
+    })
+}
+
+// showing the history as list items and appending the search to the list 
+function showHistory(name,historyListItems){
+    var search = $("<li>");
+    search.addClass("list-group-item");
+    search.text(name);
+    historyListItems.append(search);
+}
+
+// function to clear the search history in local story based on clicking the btn
+function clearSearchHistory(){
+    localStorage.removeItem("history");
+    $("#searchHistory").empty();
+    getWeatherData();
+}
+// calling the function that starts the weather query and building of the elements with response
+getWeatherData();
+
+
+// ON CLICKS
+$("#submitSearch").on("click",getWeatherData);
+$("#searchHistory").on("click",getWeatherData);
+$("#clearHistory").on("click",clearSearchHistory);
+
