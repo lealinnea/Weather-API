@@ -1,5 +1,7 @@
 
-.navbar {  
+.jumbotron {  
+  color: white;
+  text-align: center;
   background: rgb(24, 153, 255);
   background: linear-gradient(
     148deg,
@@ -9,25 +11,17 @@
   );
   margin-bottom: 40px;
 }
-.navbar a{
-    color: white;
-    font-weight: bold;
-    font-size: 30px;
-  
-}
+
 .btn{
     margin-top: 10px;
 }
-
-.col{
-    background: rgb(24, 153, 255);
-    background: linear-gradient(
-      148deg,
-      rgba(24, 153, 255, 1) 0%,
-      rgba(0, 52, 255, 1) 51%,
-      rgb(1, 28, 136) 95%
-    );
-    color: white;  
+.card{
+  background-color: #343C69;
+  color: white;
+}
+.list-group-item{
+  background-color: #CCCCCC;
+  color: black;
 }
 
 #favorable{

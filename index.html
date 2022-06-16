@@ -11,7 +11,7 @@
 
 <body>
     <div class="row" >
-        <div class="col-sm-12 jumbotron mb-10" style="background-color: skyblue" >
+        <div class="col-sm-12 jumbotron mb-10"  >
             <header class="text-center h1">Weather Dashboard</header>
         </div>
     </div>
@@ -19,20 +19,20 @@
      <!-- SEARCH PANEL WITH HISTORY -->
     <div class="container">
         <div class="row">
-            <div class="col-sm-4 col-md-4 panel panel-default" style="background-color: blanchedalmond">
+            <div class="col-sm-4 col-md-4 panel panel-default">
                 <div class="panel-body">
                     <div class="container mt-3">
                         <label class="h5" for="citySearch">Search City</label>
                         <div class="input-group mb-2">
                             <input type="text" class="form-control col-md-9 mb-2" id="cityName">
                             <div class="input-group-append col-md-3 mb-2">
-                                <button class="btn-dark" type="button" id="submitSearch">Search</button>
+                                <button class="btn-primary" type="button" id="submitSearch">Search</button>
                             </div>
                         </div>
 
                         <div class="card">
                             <ul class="list-group" id="searchHistory"></ul>
-                            <button type="button" id="clearHistory" class="btn btn-danger btn-block">Clear Search History</button>
+                            <button type="button" id="clearHistory" class="btn btn-secondary btn-block">Clear Search History</button>
                         </div>
                     </div>
                 </div>
@@ -40,7 +40,7 @@
             <!-- MAIN DAY CARD -->
             <div class="col-sm-8 col-md-8">
                 <div class="row">
-                    <div class="card mx-auto my-3 mb-3">
+                    <div class="card mx-auto col-sm-12 col-md-12 my-3 mb-3">
                         <div class="card-body">
                             <p class="h4" id="city">City name</p>
                             <p>Temperature: <span id="temperature"></span></p>
