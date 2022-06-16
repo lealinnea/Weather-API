@@ -6,4 +6,5 @@ Challenge is to build a weather dashboard that will run in the browser and featu
 ## Screenshots
 
 ## Link to Deployed Page
+https://lealinnea.github.io/Weather-API/
 
